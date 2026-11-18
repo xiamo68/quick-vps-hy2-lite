@@ -1,0 +1,11 @@
+[Unit]
+Description=Renew and deploy HY2 Lite IP certificate
+After=network-online.target hy2-lite-edge.service sing-box.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/hy2-lite/bin/certbot renew --config-dir /etc/hy2-lite/acme --work-dir /var/lib/hy2-lite-acme/work --logs-dir /var/lib/hy2-lite-acme/logs --non-interactive
+ExecStart=/opt/hy2-lite/bin/publish-certificate --reload
+ExecStart=/opt/hy2-lite/bin/publish-certificate --reload --domain
+UMask=0077

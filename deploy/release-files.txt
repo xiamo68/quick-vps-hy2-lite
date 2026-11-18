@@ -1,0 +1,25 @@
+# 当前可纳入公开部署包的文件。后续阶段逐项追加；禁止打包整个工作区。
+check.sh
+config/install.example.env
+deploy/preflight.py
+docs/PUBLIC_RELEASE_PLAN.md
+install.sh
+requirements.txt
+hy2_lite/
+deploy/install_config.py
+deploy/check_install_probe.py
+deploy/dependencies.env
+deploy/hy2-lite-web.service
+deploy/hy2-lite-executor.service
+deploy/templates/
+docs/FRESH_INSTALL.md
+docs/assets/dashboard.png
+docs/assets/users.png
+docs/assets/subscriptions.png
+verify.sh
+deploy/verify_install.py
+deploy/operate_install.py
+docs/VERIFY.md
+docs/PUBLIC_OPERATIONS.md
+docs/RELEASE.md
+CHANGELOG.md

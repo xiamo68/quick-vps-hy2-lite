@@ -1,0 +1,13 @@
+{
+	auto_https off
+}
+
+:80 {
+	handle /.well-known/acme-challenge/* {
+		root * /var/lib/hy2-lite-acme/webroot
+		file_server
+	}
+	handle {
+		respond 404
+	}
+}

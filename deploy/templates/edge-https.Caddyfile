@@ -1,0 +1,22 @@
+{
+	auto_https off
+	default_sni @PUBLIC_IPV4@
+	servers {
+		protocols h1 h2
+	}
+}
+
+:80 {
+	handle /.well-known/acme-challenge/* {
+		root * /var/lib/hy2-lite-acme/webroot
+		file_server
+	}
+	handle {
+		redir https://@PUBLIC_IPV4@{uri} 308
+	}
+}
+
+https://@PUBLIC_IPV4@ {
+	tls /etc/hy2-lite/tls/current/fullchain.pem /etc/hy2-lite/tls/current/privkey.pem
+	reverse_proxy 127.0.0.1:18770
+}

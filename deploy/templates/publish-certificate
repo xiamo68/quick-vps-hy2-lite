@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+
+tls=/etc/hy2-lite/tls
+source=/etc/hy2-lite/acme/live/hy2-lite-ip
+link=current
+if [[ "${2:-}" == --domain ]]; then
+  source=/etc/hy2-lite/acme/live/hy2-lite-domain
+  link=domain-current
+  [[ -s "$source/fullchain.pem" ]] || exit 0
+fi
+exec 9>/var/lib/hy2-lite-operator/jobs.lock
+flock 9
+old=$(readlink "$tls/$link" || true)
+if [[ -n "$old" ]] && cmp -s "$source/fullchain.pem" "$tls/$link/fullchain.pem" &&
+   cmp -s "$source/privkey.pem" "$tls/$link/privkey.pem"; then
+  exit 0
+fi
+
+generation=$(mktemp -d "$tls/cert.XXXXXXXX")
+chgrp hy2-lite-tls "$generation"
+chmod 0750 "$generation"
+install -m 0640 -g hy2-lite-tls "$source/fullchain.pem" "$generation/fullchain.pem"
+install -m 0640 -g hy2-lite-tls "$source/privkey.pem" "$generation/privkey.pem"
+swap() {
+  ln -sfn -- "$1" "$tls/.next"
+  mv -Tf -- "$tls/.next" "$tls/$link"
+}
+reload_services() {
+  systemctl reload hy2-lite-edge.service &&
+    { [[ "$link" != current ]] || systemctl reload sing-box.service; }
+}
+swap "$generation"
+if [[ "${1:-}" == --reload ]]; then
+  if ! reload_services; then
+    if [[ -n "$old" ]]; then
+      swap "$old"
+      reload_services || true
+    else
+      rm -f -- "$tls/$link"
+    fi
+    exit 1
+  fi
+fi

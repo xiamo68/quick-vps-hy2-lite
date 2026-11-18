@@ -1,0 +1,19 @@
+[Unit]
+Description=HY2 Lite account change executor
+After=sing-box.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/hy2-lite/current
+ExecStart=/opt/hy2-lite/current/.venv/bin/python -B -m hy2_lite --db /var/lib/hy2-lite/panel.sqlite3 execute-jobs --settings /etc/hy2-lite/operator.json
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/etc/sing-box /var/lib/hy2-lite /var/lib/hy2-lite-operator
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }} · HY2 Lite</title>
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='panel.css') }}">
+<script defer src="{{ url_for('static', filename='panel.js') }}"></script>
+</head>
+<body data-page="{{ page }}">
+{% if page == 'login' %}
+<header class="login-top"><button type="button" class="icon theme" aria-label="Toggle theme">☾</button></header>
+<main class="login">
+  <div class="brand"><i class="hex"></i>HY2 Lite</div>
+  <h1>Administrator sign-in</h1>
+  <form id="login">
+    <label>Username<input name="username" autocomplete="username" required maxlength="64"></label>
+    <label>Password<span class="password"><input name="password" type="password" autocomplete="current-password" required><button type="button" id="show-password" class="icon" aria-label="Show password">◉</button></span></label>
+    <label>Two-factor code<input name="otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="Required if two-factor authentication is enabled"></label>
+    <p class="feedback" role="status"></p><button class="primary" type="submit">Sign in</button>
+  </form>
+</main>
+{% else %}
+<aside class="sidebar">
+  <a class="brand" href="/"><i class="hex"></i>HY2 Lite</a>
+  <nav aria-label="Main navigation">
+    {% for key, label, icon in navigation %}<a href="{{ '/' if key == 'dashboard' else '/' ~ key }}" {% if key == page %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">{{ icon }}</span>{{ label }}</a>{% endfor %}
+  </nav>
+  <div class="sidebar-user">♙　Administrator</div>
+</aside>
+<div class="workspace">
+  <header class="top"><a class="brand mobile" href="/"><i class="hex"></i>HY2 Lite</a><button type="button" class="icon theme" aria-label="Toggle theme">☾</button><button id="logout" class="icon" aria-label="Sign out" title="Sign out">↪</button></header>
+  <main class="content">
+    <div class="page-title"><h1>{{ title }}</h1>{% if page == 'users' %}<button class="primary" id="new-user">＋ Add user</button>{% endif %}</div>
+    <p class="feedback" role="status" hidden></p>
+    {% if page == 'dashboard' %}
+    <p class="muted" id="sample-time">China Standard Time</p>
+    <div class="panel services" id="services"></div>
+    <div class="metrics" id="summary"></div>
+    <div class="split">
+      <section class="panel"><div class="section-head"><h2>Traffic trends</h2><select id="scope" aria-label="Traffic source"><option value="proxy">Proxy</option><option value="network">Server network interface</option></select><select id="period" aria-label="Time range"><option value="24">Last 24 hours</option><option value="7">Last 7 days</option></select></div><div id="dashboard-chart"></div></section>
+      <section class="panel"><h2>Top users by traffic</h2><div id="ranking"></div></section>
+    </div>
+    <section class="panel"><h2>Server resources</h2><div id="resources" class="resources"></div></section>
+    {% elif page == 'users' %}
+    <div class="filters"><input id="search" type="search" aria-label="Search users" placeholder="Search by name or user ID"><select id="state" aria-label="Status"><option value="">All statuses</option><option value="enabled">Enabled</option><option value="disabled">Disabled</option></select><select id="sort" aria-label="Sort"><option value="name">Display name</option><option value="id">User ID</option><option value="newest">Newest</option><option value="active">Last active</option><option value="traffic">Today's traffic</option></select></div>
+    <section class="panel table-wrap"><table><thead><tr><th>Display name</th><th>User ID</th><th>Status</th><th>Today's traffic</th><th>Last hour</th><th>This month</th><th>Total</th><th>Last active</th><th>Actions</th></tr></thead><tbody id="user-list"></tbody></table></section>
+    <div class="pager"><button id="user-prev">Previous</button><button id="user-next">Next</button></div>
+    <dialog id="user-dialog"><form id="user-form"><h2 id="user-form-title"></h2><p class="muted" id="user-id"></p><label>Display name<input name="display_name" required maxlength="80"></label><label>Notes<textarea name="remark" maxlength="500"></textarea></label><p class="muted" id="user-help"></p><div class="actions"><button type="button" data-close>Cancel</button><button class="primary">Save</button></div></form></dialog>
+    <dialog id="confirm-dialog"><form id="confirm-form"><h2 id="confirm-title"></h2><p id="confirm-description"></p><div class="actions"><button type="button" data-close>Cancel</button><button class="danger">Confirm request</button></div></form></dialog>
+    <section class="panel" id="job-panel" data-immediate="{{ 'yes' if immediate_jobs else 'no' }}" hidden><div class="section-head"><h2>Change jobs</h2><button id="refresh-job">Refresh status</button></div><div id="job-status" aria-live="polite"></div></section>
+    {% elif page == 'traffic' %}
+    <div class="filters"><label>User<select id="traffic-user"></select></label><label>Date<input type="date" id="traffic-date"></label><label>Range<select id="traffic-period"><option value="day">Selected date</option><option value="yesterday">Yesterday</option><option value="24">Last 24 hours</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="month">This month</option></select></label><button id="csv" class="accent">↓ Export CSV</button></div>
+    <div class="metrics" id="traffic-summary"></div>
+    <section class="panel"><h2 id="traffic-title">Traffic trends</h2><div id="traffic-chart"></div><p class="muted">China Standard Time · grouped by sampling interval</p></section>
+    <section class="panel table-wrap"><table><thead><tr><th>Time</th><th>Upload</th><th>Download</th><th>Total</th><th>Coverage</th></tr></thead><tbody id="traffic-list"></tbody></table></section>
+    {% elif page == 'subscriptions' %}
+    <div class="split subscriptions">
+      <section class="panel"><input id="subscription-search" type="search" placeholder="Search users" aria-label="Search subscription users"><div class="table-wrap"><table><thead><tr><th>User</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody id="subscription-list"></tbody></table></div></section>
+      <section class="panel"><h2 id="subscription-name">Subscription details</h2><p class="muted" id="subscription-id">Select a user</p><div id="subscription-detail" hidden><label>Subscription URL<input value="https://••••••/••••••" readonly aria-label="Hidden subscription URL"></label><div class="export-actions"><button class="primary" data-export="url">Copy link</button><button data-export="qr">Show QR code</button><button class="accent" data-export="yaml">Download YAML</button><button data-export="json">Download JSON</button><button data-export="uri">Copy share URI</button></div></div></section>
+    </div>
+    <dialog id="qr-dialog"><h2>Subscription QR code</h2><img id="qr-image" width="240" height="240" alt="Subscription QR code"><div class="actions"><button data-close>Close</button></div></dialog>
+    {% elif page == 'settings' %}
+    <nav class="tabs" aria-label="System settings"><button data-tab="collector" aria-current="true">Collector</button><button data-tab="security">Security</button><button data-tab="backups">Backups</button><button data-tab="audit">Audit log</button></nav>
+    <div class="split settings">
+      <section class="panel" data-setting="collector"><h2>Collector status</h2><div id="collector-status"></div><h2>Latest event</h2><div id="collector-event"></div></section>
+      <section class="panel" data-setting="security"><h2>Security</h2><p id="totp-status" class="muted"></p><form id="password-form"><label>Current password<input name="password" type="password" required autocomplete="current-password"></label><label>New password<input name="new_password" type="password" required minlength="8" maxlength="256" autocomplete="new-password"></label><label>Two-factor code<input name="otp" inputmode="numeric" maxlength="6"></label><button class="primary">Change password</button></form><hr><form id="totp-form"><label>Current password<input name="password" type="password" required autocomplete="current-password"></label><label>Two-factor code<input name="otp" inputmode="numeric" maxlength="6"></label><button id="totp-action" type="submit">Set up two-factor authentication</button></form><form id="totp-confirm" hidden><label>Authenticator key<input name="secret" readonly></label><label>Two-factor code<input name="otp" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6"></label><button class="primary">Confirm setup</button></form></section>
+      <section class="panel" data-setting="backups"><h2>Backups</h2><p class="muted" id="backup-status">Loading backup status</p><button id="backup-create" class="accent">Create database backup</button></section>
+      <section class="panel" data-setting="audit"><h2>Audit log</h2><div class="table-wrap"><table><thead><tr><th>Time</th><th>Actions</th><th>Result</th></tr></thead><tbody id="audit-list"></tbody></table></div><div class="pager"><button id="audit-prev">Previous</button><button id="audit-next">Next</button></div></section>
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endif %}
+</body></html>

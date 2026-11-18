@@ -1,0 +1,22 @@
+[Unit]
+Description=HY2 Lite HTTP challenge and HTTPS endpoint
+After=network.target
+
+[Service]
+User=caddy
+SupplementaryGroups=hy2-lite-tls
+ExecStart=/usr/bin/caddy run --config /etc/hy2-lite/edge.Caddyfile --adapter caddyfile
+ExecReload=/usr/bin/caddy reload --config /etc/hy2-lite/edge.Caddyfile --adapter caddyfile --force
+Environment=XDG_DATA_HOME=/var/lib/hy2-lite-edge
+Environment=XDG_CONFIG_HOME=/var/lib/hy2-lite-edge
+StateDirectory=hy2-lite-edge
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

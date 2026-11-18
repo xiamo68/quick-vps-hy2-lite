@@ -1,0 +1,20 @@
+[Unit]
+Description=HY2 Lite loopback traffic collector
+After=sing-box.service
+
+[Service]
+User=hy2-lite
+WorkingDirectory=/opt/hy2-lite/current
+EnvironmentFile=/etc/hy2-lite/collector.env
+LoadCredential=api.token:/etc/hy2-lite/api.token
+ExecStart=/opt/hy2-lite/current/.venv/bin/python -B -m hy2_lite --db /var/lib/hy2-lite/panel.sqlite3 collect --token-file ${CREDENTIALS_DIRECTORY}/api.token $HY2_INTERFACE_ARGS
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+ReadWritePaths=/var/lib/hy2-lite
+UMask=0077
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

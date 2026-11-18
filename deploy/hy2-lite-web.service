@@ -1,0 +1,23 @@
+[Unit]
+Description=HY2 Lite loopback web panel
+After=network.target
+
+[Service]
+Type=simple
+User=hy2-lite
+Group=hy2-lite
+WorkingDirectory=/opt/hy2-lite/current
+EnvironmentFile=/etc/hy2-lite/web.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/hy2-lite/current/.venv/bin/python -m hy2_lite --db /var/lib/hy2-lite/panel.sqlite3 serve --origin ${HY2_PUBLIC_ORIGIN} --totp-key-file /etc/hy2-lite/totp.fernet-key --subscription-key-file /etc/hy2-lite/subscriptions.fernet-key --backup-directory /var/lib/hy2-lite/backups
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/hy2-lite
+
+[Install]
+WantedBy=multi-user.target
