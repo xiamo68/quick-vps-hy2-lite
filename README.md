@@ -27,7 +27,8 @@
 
 ## 第一步：准备服务器
 
-首次搭建推荐用**阿里云轻量应用服务器**。在控制台选择「创建服务器」，按你的预算、地域和流量需求选择套餐，镜像选择 **系统镜像 → Ubuntu 24.04 → x86_64**。购买前确认所选地域提供该镜像和公网 IPv4，费用、套餐流量和续费条款以购买页为准。其他云厂商的 VPS 满足上面的系统要求也可使用。[阿里云创建服务器指南](https://help.aliyun.com/zh/simple-application-server/user-guide/create-a-server/) · [支持的系统镜像](https://help.aliyun.com/zh/simple-application-server/product-overview/images)
+首次搭建推荐用**阿里云轻量应用服务器**。在控制台选择「创建服务器」，按你的预算、地域和流量需求选择套餐，镜像选择 **系统镜像 → Ubuntu 24.04 → x86_64**。购买前确认所选地域提供该镜像和公网 IPv4，费用、套餐流量和续费条款以购买页为准（上传时轻量应用服务器2核1G国际版28一个月）。其他云厂商的 VPS 满足上面的系统要求也可使用。[阿里云创建服务器指南](https://help.aliyun.com/zh/simple-application-server/user-guide/create-a-server/) · [支持的系统镜像](https://help.aliyun.com/zh/simple-application-server/product-overview/images)
+
 
 创建完成后记录公网 IPv4，设置 SSH 登录方式。在实例的「防火墙」页确认规则如下。如果系统内也启用了防火墙，按相同用途放行相应端口。[阿里云防火墙指南](https://help.aliyun.com/zh/simple-application-server/user-guide/manage-the-firewall-of-a-server)
 
